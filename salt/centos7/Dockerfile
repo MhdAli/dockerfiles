@@ -13,9 +13,11 @@ ADD saltstack-centos.repo /etc/yum.repos.d/salt-centos.repo
 
 RUN rpm --import https://repo.saltstack.com/yum/redhat/7/x86_64/latest/SALTSTACK-GPG-KEY.pub && \
     rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-RUN yum -y install salt-minion net-tools python-pip &&\
+RUN yum -y install salt-minion python-pip &&\
     systemctl enable salt-minion && \
     pip install testinfra
+
+RUN yum -y install iproute net-tools
 
 ENV container=docker
 VOLUME [ "/sys/fs/cgroup" ]
