@@ -1,17 +1,13 @@
 FROM debian:jessie
 
+ADD saltstack.list /etc/apt/sources.list.d/
 RUN apt-get update \
- && apt-get -y install wget \
- && wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - \
- && echo "deb http://repo.saltstack.com/apt/debian/8/amd64/latest jessie main" >> /etc/apt/mirror.list
+      && apt-get -y install wget \
+      && wget -O - https://repo.saltstack.com/apt/debian/8/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - \
+      && apt-get update \
+      && apt-get -y install salt-minion
 
-ADD tty.conf /etc/init/
-RUN apt-get update \
- && apt-get -y install salt-minion net-tools python-pip \
- && systemctl enable salt-minion
-
-ENV container=docker
-
-RUN pip install testinfra
-
-CMD ["/sbin/init"]
+ADD dumb-init /
+ENTRYPOINT ["/dumb-init"]
+ADD minion /etc/salt/
+CMD ["salt-minion", "-linfo"]
